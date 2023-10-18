@@ -1,13 +1,17 @@
 const connectToMongo = require('./db');
 const express = require('express')
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+require('dotenv').config();
 
-connectToMongo();
+const mongoURI = process.env.DB_PASSWORD;
+connectToMongo(mongoURI);
 const app = express();
 const port = 5000;
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // Availabe Routes
 app.use('/api/auth', require('./routes/Auth'))

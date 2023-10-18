@@ -6,14 +6,14 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const fetchuser = require('../middleware/fetchuser')
 
-const JWT_SECRET = "Pratapisagoodboy"
+const JWT_SECRET = process.env.JWT_SECRET
 
 
 // Route 1: Create user using: POST "/api/auth/createuser". No Login required
 router.post('/createuser', [
     body('name').isLength({ min: 3 }),
     body('email', "Please enter valid Email").isEmail(),
-    body('password', "Please enter a valid Password").isAlphanumeric().isLength({ min: 5 }),
+    body('password', "Please enter a valid Password").isLength({ min: 5 }),
     body('gender').not().isEmpty()],
     async (req, res) => {
         let success = false;
@@ -88,9 +88,10 @@ router.post('/login', [
         // If credentials match correctly, then sending JWT using user-ID and JWT_SECRET
         const data = { id: user.id }
         const authToken = jwt.sign(data, JWT_SECRET)
+        // res.cookie("authToken", authToken);
         res.json({ success, authToken });
-
     }
+
     catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error")
@@ -101,25 +102,17 @@ router.post('/login', [
 
 //ROUTE 3: Get logged-in User details using: POST "/api/auth/getuser".login required
 router.get('/getuser', fetchuser, async (req, res) => {
+    let success = false;
     try {
         const userID = req.user.id;
         const user = await User.findById(userID).select("-password");
-        res.send(user)
+        res.json(user)
         
     } catch (error) {
         console.error(error.message);
-        res.status(500).send("Internal Server Error")
+        res.status(500).json({success,error:"Internal Server Error, Please Login again !"})
     }
 })
-
-
-
-
-
-
-
-
-
 
 
 

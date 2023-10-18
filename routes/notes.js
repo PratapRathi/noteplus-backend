@@ -96,7 +96,7 @@ router.delete('/deletenote/:id', fetchuser, async (req, res) => {
     }
 })
 
-// ROUTE5: Permanent delete a Note using: DELETE "/api/notes/permanentdeletenote". Login required
+// ROUTE 5: Permanent delete a Note using: DELETE "/api/notes/permanentdeletenote". Login required
 router.delete('/permanentdeletenote/:id', fetchuser, async (req, res) => {
     let success = false;
     try {
@@ -118,7 +118,7 @@ router.delete('/permanentdeletenote/:id', fetchuser, async (req, res) => {
 
 })
 
-// ROUTE5: Restore deleted a Note using: DELETE "/api/notes/restorenote". Login required
+// ROUTE 6: Restore deleted a Note using: DELETE "/api/notes/restorenote". Login required
 router.post('/restorenote/:id',fetchuser, async(req,res) => {
     let success = false;
     try{
@@ -134,6 +134,30 @@ router.post('/restorenote/:id',fetchuser, async(req,res) => {
     note = await deletedNote.save();
         success = true;
         res.json({ success, note: deletedNote })
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ success, message: "Internal Server Error" })
+    }
+})
+
+// ROUTE 7: Fetch deleted a Note from Bin DB using: GET "/api/notes/restorenote". Login required
+router.get('/getdeletednotes',fetchuser, async (req,res) => {
+    try {
+        const notes = await Bin.find({user:req.user.id});
+        res.json(notes);
+        
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ success, message: "Internal Server Error" })
+    }
+})
+
+// ROUTE 8: Fetch Note based of Tag using: GET "/api/notes/restorenote". Login required
+router.get('/gettagnote/:tag',fetchuser, async (req,res) => {
+    try {
+        const notes = await Note.find({user:req.user.id, tag:req.params.tag});
+        res.json(notes);
 
     } catch (error) {
         console.error(error.message);
